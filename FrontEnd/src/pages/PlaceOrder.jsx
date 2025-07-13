@@ -10,22 +10,28 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify';
 
 function PlaceOrder() {
-
-  let [method, setMethod] = useState('cod');
-  const { cartItem, setCartItem, getCartAmount, delivery_fee, products } = useContext(ShopDataContext);
-  let { serverUrl } = useContext(AuthDataContext);
+  let [method, setMethod] = useState('cod')
+  const { cartItem, setCartItem, getCartAmount, delivery_fee, products } = useContext(ShopDataContext)
+  let { serverUrl } = useContext(AuthDataContext)
   let navigate = useNavigate();
 
   let [formData, setFormData] = useState({
-    firstName: '', lastName: '', email: '', street: '', city: '',
-    state: '', pincode: '', country: '', phone: ''
-  });
+    firstName: '',
+    lastName: '',
+    email: '',
+    street: '',
+    city: '',
+    state: '',
+    pincode: '',
+    country: '',
+    phone: ''
+  })
 
   const onChangeHandler = (e) => {
     const name = e.target.name;
     const value = e.target.value;
-    setFormData(data => ({ ...data, [name]: value }));
-  };
+    setFormData(data => ({ ...data, [name]: value }))
+  }
 
   const initPay = (order) => {
     const options = {
@@ -36,11 +42,12 @@ function PlaceOrder() {
       description: 'Order Payment',
       order_id: order.id,
       handler: async function (response) {
-        const { data } = await axios.post(serverUrl + '/api/order/verifyrazorpay', response, { withCredentials: true });
+        const { data } = await axios.post(serverUrl + '/api/order/verifyrazorpay',
+          response, { withCredentials: true })
         if (data) {
           toast.success("🎉 Payment successful and order placed!");
-          navigate("/order");
-          setCartItem({});
+          navigate("/order")
+          setCartItem({})
         }
       },
       prefill: {
@@ -48,24 +55,26 @@ function PlaceOrder() {
         email: formData.email,
         contact: formData.phone,
       },
-      theme: { color: '#3399cc' },
+      theme: {
+        color: '#3399cc',
+      },
     };
     const rzp = new window.Razorpay(options);
     rzp.open();
   };
 
   const onSubmitHandler = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
     try {
-      let orderItems = [];
+      let orderItems = []
       for (const items in cartItem) {
         for (const item in cartItem[items]) {
           if (cartItem[items][item] > 0) {
-            const itemInfo = structuredClone(products.find(product => product._id === items));
+            const itemInfo = structuredClone(products.find(product => product._id === items))
             if (itemInfo) {
-              itemInfo.size = item;
-              itemInfo.quantity = cartItem[items][item];
-              orderItems.push(itemInfo);
+              itemInfo.size = item
+              itemInfo.quantity = cartItem[items][item]
+              orderItems.push(itemInfo)
             }
           }
         }
@@ -75,113 +84,108 @@ function PlaceOrder() {
         address: formData,
         items: orderItems,
         amount: getCartAmount() + delivery_fee
-      };
+      }
 
       switch (method) {
         case 'cod': {
           const result = await axios.post(serverUrl + "/api/order/placeorder", orderData, { withCredentials: true });
+
           if (result.data) {
             toast.success("🎉 Order placed successfully with Cash on Delivery!");
-            setCartItem({});
-            navigate("/order");
+            setCartItem({})
+            navigate("/order")
           } else {
             toast.error(result.data.message || "Something went wrong while placing the order.");
+            console.log(result.data.message)
           }
           break;
         }
 
         case 'razorpay': {
           const resultRazorpay = await axios.post(serverUrl + "/api/order/razorpay", orderData, { withCredentials: true });
+
           if (resultRazorpay.data) {
-            initPay(resultRazorpay.data);
+            initPay(resultRazorpay.data)
           }
           break;
         }
 
-        default: break;
+        default: {
+          break;
+        }
       }
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
-  };
+  }
 
   return (
     <div className='w-full min-h-screen bg-gradient-to-l from-[#141414] to-[#0c2025] 
-    flex flex-col md:flex-row items-start justify-center gap-[30px] pt-[80px] pb-[40px] px-3'>
+    overflow-y-auto flex flex-col md:flex-row items-start justify-center gap-[30px] 
+    pt-[80px] pb-[40px] px-3'>
 
-      {/* Delivery Info */}
-      <div className='md:w-[50%] w-full'>
-        <form onSubmit={onSubmitHandler} className='w-full flex flex-col gap-3'>
+      {/* Form Section */}
+      <div className='lg:w-[50%] w-full flex items-center justify-center'>
+        <form className='w-full max-w-[600px] flex flex-col gap-5' onSubmit={onSubmitHandler}>
           <Title text1={"DELIVERY "} text2={"INFORMATION"} />
 
           <div className='flex gap-3'>
-            <input type="text" name="firstName" placeholder="First Name"
-              className='flex-1 h-[45px] rounded-md bg-slate-700 placeholder:text-white px-4 text-[16px]'
-              required value={formData.firstName} onChange={onChangeHandler} />
-            <input type="text" name="lastName" placeholder="Last Name"
-              className='flex-1 h-[45px] rounded-md bg-slate-700 placeholder:text-white px-4 text-[16px]'
-              required value={formData.lastName} onChange={onChangeHandler} />
+            <input type="text" name='firstName' required value={formData.firstName} onChange={onChangeHandler}
+              placeholder='First Name' className='w-1/2 h-[50px] px-4 rounded-md bg-slate-700 text-white' />
+            <input type="text" name='lastName' required value={formData.lastName} onChange={onChangeHandler}
+              placeholder='Last Name' className='w-1/2 h-[50px] px-4 rounded-md bg-slate-700 text-white' />
           </div>
 
-          <input type="email" name="email" placeholder="Email"
-            className='w-full h-[45px] rounded-md bg-slate-700 placeholder:text-white px-4 text-[16px]'
-            required value={formData.email} onChange={onChangeHandler} />
+          <input type="email" name='email' required value={formData.email} onChange={onChangeHandler}
+            placeholder='Email' className='w-full h-[50px] px-4 rounded-md bg-slate-700 text-white' />
 
-          <input type="text" name="street" placeholder="Street"
-            className='w-full h-[45px] rounded-md bg-slate-700 placeholder:text-white px-4 text-[16px]'
-            required value={formData.street} onChange={onChangeHandler} />
+          <input type="text" name='street' required value={formData.street} onChange={onChangeHandler}
+            placeholder='Street' className='w-full h-[50px] px-4 rounded-md bg-slate-700 text-white' />
 
           <div className='flex gap-3'>
-            <input type="text" name="city" placeholder="City"
-              className='flex-1 h-[45px] rounded-md bg-slate-700 placeholder:text-white px-4 text-[16px]'
-              required value={formData.city} onChange={onChangeHandler} />
-            <input type="text" name="state" placeholder="State"
-              className='flex-1 h-[45px] rounded-md bg-slate-700 placeholder:text-white px-4 text-[16px]'
-              required value={formData.state} onChange={onChangeHandler} />
+            <input type="text" name='city' required value={formData.city} onChange={onChangeHandler}
+              placeholder='City' className='w-1/2 h-[50px] px-4 rounded-md bg-slate-700 text-white' />
+            <input type="text" name='state' required value={formData.state} onChange={onChangeHandler}
+              placeholder='State' className='w-1/2 h-[50px] px-4 rounded-md bg-slate-700 text-white' />
           </div>
 
           <div className='flex gap-3'>
-            <input type="text" name="pincode" placeholder="Pincode"
-              className='flex-1 h-[45px] rounded-md bg-slate-700 placeholder:text-white px-4 text-[16px]'
-              required value={formData.pincode} onChange={onChangeHandler} />
-            <input type="text" name="country" placeholder="Country"
-              className='flex-1 h-[45px] rounded-md bg-slate-700 placeholder:text-white px-4 text-[16px]'
-              required value={formData.country} onChange={onChangeHandler} />
+            <input type="text" name='pincode' required value={formData.pincode} onChange={onChangeHandler}
+              placeholder='Pincode' className='w-1/2 h-[50px] px-4 rounded-md bg-slate-700 text-white' />
+            <input type="text" name='country' required value={formData.country} onChange={onChangeHandler}
+              placeholder='Country' className='w-1/2 h-[50px] px-4 rounded-md bg-slate-700 text-white' />
           </div>
 
-          <input type="text" name="phone" placeholder="Phone"
-            className='w-full h-[45px] rounded-md bg-slate-700 placeholder:text-white px-4 text-[16px]'
-            required value={formData.phone} onChange={onChangeHandler} />
+          <input type="text" name='phone' required value={formData.phone} onChange={onChangeHandler}
+            placeholder='Phone Number' className='w-full h-[50px] px-4 rounded-md bg-slate-700 text-white' />
 
-          <button type="submit" className='text-[15px] mt-4 w-fit mx-auto bg-[#3bcee848] px-8 py-2 
+          <button type="submit" className='text-[15px] mt-6 w-full bg-[#3bcee848] px-6 py-3 
           rounded-xl text-white hover:bg-[#3bcee8] transition-all duration-300'>
             PLACE ORDER
           </button>
         </form>
       </div>
 
-      {/* Order Summary + Payment */}
-      <div className='md:w-[40%] w-full flex flex-col gap-6'>
+      {/* Cart Total & Payment Section */}
+      <div className='lg:w-[40%] w-full flex flex-col items-center justify-center gap-6 px-3'>
         <CartTotal />
-        <div className='pt-2'>
-          <Title text1={"PAYMENT "} text2={"METHOD"} />
-        </div>
+        <Title text1={"PAYMENT "} text2={"METHOD"} />
 
-        <div className='flex flex-wrap gap-4 mt-2 items-center'>
-          <button onClick={() => setMethod('razorpay')} className={`w-[140px] h-[45px] 
-            rounded-md overflow-hidden border-2 ${method === 'razorpay' ? 'border-blue-500' : 'border-transparent'}`}>
-            <img src={razorpay} alt="Razorpay" className='w-full h-full object-cover' />
+        <div className='w-full flex flex-col md:flex-row items-center justify-center gap-5'>
+          <button onClick={() => setMethod('razorpay')} className={`w-[150px] h-[50px] rounded-sm 
+            ${method === 'razorpay' ? 'border-[5px] border-blue-900' : ''}`}>
+            <img src={razorpay} alt="razorpay" className='w-full h-full object-fill rounded-sm' />
           </button>
 
-          <button onClick={() => setMethod('cod')} className={`w-[160px] h-[45px] bg-gradient-to-t 
-            from-[#95b3f8] to-white text-sm px-4 py-2 rounded-md text-[#332f6f] font-semibold 
-            ${method === 'cod' ? 'border-2 border-blue-500' : ''}`}>
+          <button onClick={() => setMethod('cod')} className={`w-[200px] h-[50px] bg-gradient-to-t
+            from-[#95b3f8] to-[white] text-[14px] px-[20px] rounded-sm text-[#332f6f]
+            font-bold ${method === 'cod' ? 'border-[5px] border-blue-900' : ''}`}>
             CASH ON DELIVERY
           </button>
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-export default PlaceOrder;
+export default PlaceOrder
