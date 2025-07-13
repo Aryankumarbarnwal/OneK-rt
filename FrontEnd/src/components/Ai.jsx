@@ -30,52 +30,62 @@ function Ai() {
     let isRecognized = false // To track if speech was understood
 
     recognition.onresult = (e) => {
-        isRecognized = true
-        const transcript = e.results[0][0].transcript.trim().toLowerCase()
-        console.log("🎤 Transcript:", transcript)
+    isRecognized = true
+    const transcript = e.results[0][0].transcript.trim().toLowerCase()
+    console.log("🎤 Transcript:", transcript)
 
-        if (transcript.includes("search") && transcript.includes("open") && !showSearch) {
-            speak("Opening search")
-            setShowSearch(true)
-            navigate("/collections")
-        }
-        else if (transcript.includes("search") && transcript.includes("close") && showSearch) {
-            speak("Closing search")
-            setShowSearch(false)
-        }
-        else if (transcript.includes("collection") || transcript.includes("collections") || transcript.includes("products")) {
-            speak("Opening collection page")
-            navigate("/collections")
-        }
-        else if (transcript.includes("about")) {
-            speak("Opening about page")
-            navigate("/about")
-            setShowSearch(false)
-        }
-        else if (transcript.includes("home")) {
-            speak("Opening home page")
-            navigate("/")
-            setShowSearch(false)
-        }
-        else if (transcript.includes("cart") || transcript.includes("kaat") || transcript.includes("caat")) {
-            speak("Opening your cart")
-            navigate("/cart")
-            setShowSearch(false)
-        }
-        else if (transcript.includes("contact")) {
-            speak("Opening contact page")
-            navigate("/contact")
-            setShowSearch(false)
-        }
-        else if (transcript.includes("order")) {
-            speak("Opening your orders page")
-            navigate("/order")
-            setShowSearch(false)
-        }
-        else {
-            toast.error("Command not recognized. Please try again.")
-        }
+    if (transcript.includes("search") && transcript.includes("open") && !showSearch) {
+        speak("Opening search")
+        openingSound.play()
+        setShowSearch(true)
+        navigate("/collections")
     }
+    else if (transcript.includes("search") && transcript.includes("close") && showSearch) {
+        speak("Closing search")
+        openingSound.play()
+        setShowSearch(false)
+    }
+    else if (transcript.includes("collection") || transcript.includes("collections") || transcript.includes("products")) {
+        speak("Opening collection page")
+        openingSound.play()
+        setShowSearch(false)
+        navigate("/collections")
+    }
+    else if (transcript.includes("about")) {
+        speak("Opening about page")
+        openingSound.play()
+        setShowSearch(false)
+        navigate("/about")
+    }
+    else if (transcript.includes("home")) {
+        speak("Opening home page")
+        openingSound.play()
+        setShowSearch(false)
+        navigate("/")
+    }
+    else if (transcript.includes("cart") || transcript.includes("kaat") || transcript.includes("caat")) {
+        speak("Opening your cart")
+        openingSound.play()
+        setShowSearch(false)
+        navigate("/cart")
+    }
+    else if (transcript.includes("contact")) {
+        speak("Opening contact page")
+        openingSound.play()
+        setShowSearch(false)
+        navigate("/contact")
+    }
+    else if (transcript.includes("order")) {
+        speak("Opening your orders page")
+        openingSound.play()
+        setShowSearch(false)
+        navigate("/order")
+    }
+    else {
+        toast.error("Command not recognized. Please try again.")
+    }
+}
+
 
     recognition.onend = () => {
         if (!isRecognized) {
