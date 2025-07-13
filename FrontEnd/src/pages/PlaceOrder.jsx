@@ -140,7 +140,7 @@ function PlaceOrder() {
       <div className='lg:w-[50%] w-[100%] h-[100%] flex items-center justify-center
       lg:mt-[0px] mt-[90px]'>
         <form action="" className='lg:w-[70%] w-[95%] lg:h-[70%] h-[100%]' onSubmit={onSubmitHandler}>
-          <div>
+          <div className='py-[10px]'>
             <Title text1={"DELIVERY "} text2={"INFORMATION"} />
           </div>
           <div className='w-[100%] h-[70px] flex items-center justify-between px-[10px]'>
