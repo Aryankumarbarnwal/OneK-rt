@@ -2,7 +2,7 @@ import AuthDataContext from './AuthDataContext'
 
 
 function AuthContext ({children}) {
-  let serverUrl = "http://localhost:8000"
+  let serverUrl = "https://onek-rt-backend.onrender.com"
     let value = {
       serverUrl
     };
