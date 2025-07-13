@@ -191,11 +191,10 @@ function PlaceOrder() {
             px-[20px] shadow-sm shadow-[#343434]'  required onChange={onChangeHandler} name='phone' value={formData.phone} />
           </div>
           <button type='submit' className='text-[18px] active:bg-slate-500 cursor-pointer 
-            bg-[#3bcee848] py-[12px] px-[60px] rounded-2xl text-white flex items-center 
-              justify-center gap-[20px] border border-[#80808049] mt-8 mb-8 w-full max-w-[300px] mx-auto'>
-            PLACE ORDER
+          bg-[#3bcee848] py-[12px] px-[60px] rounded-2xl text-white flex items-center 
+          justify-center gap-[20px] border border-[#80808049] mt-8 mb-8 w-full max-w-[300px] mx-auto'>
+          PLACE ORDER
           </button>
-
 
         </form>
 
