@@ -117,7 +117,7 @@ export const adminLogin = async (req, res) =>{
             let token = await genToken1(email)
             res.cookie("adminToken",token,{
                 httpOnly:true,
-                scure:true,
+                secure:true,
                 sameSite:"none",
                 maxAge: 1 * 24 * 60 * 60 * 1000
             })
