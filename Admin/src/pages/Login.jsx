@@ -112,7 +112,7 @@ function Login() {
               rounded-lg flex items-center justify-center mt-5 text-[17px]
               font-semibold'
             >
-              {loading ? <Loading/> : "Login"}
+              Login
             </button>
           </div>
         </form>
