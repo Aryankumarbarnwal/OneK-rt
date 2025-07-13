@@ -190,11 +190,12 @@ function PlaceOrder() {
             rounded-md bg-slate-700 placeholder:text-[white] text-[18px] 
             px-[20px] shadow-sm shadow-[#343434]'  required onChange={onChangeHandler} name='phone' value={formData.phone} />
           </div>
-          <button type='submit' className='text-[18px] active:bg-slate-500 cursor-pointer 
-          bg-[#3bcee848] py-[12px] px-[60px] rounded-2xl text-white flex items-center 
-          justify-center gap-[20px] border border-[#80808049] mt-8 mb-8 w-full max-w-[300px] mx-auto'>
-          PLACE ORDER
-          </button>
+          <div>
+            <button type='submit' className='text-[18px] active:bg-slate-500 cursor-pointer 
+          bg-[#3bcee848] py-[10px] px-[50px] rounded-2xl text-white flex items-center 
+          justify-center gap-[20px] absolute lg:right-[20%] bottom-[10%] right-[35%] border-[1px]
+           border-[#80808049] ml-[30px] mt-[20px]'>PLACE ORDER</button>
+          </div>
 
         </form>
 
