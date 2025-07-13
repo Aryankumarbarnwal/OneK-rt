@@ -1,36 +1,30 @@
-import React, { useState, useContext } from 'react';
-import Title from '../components/Title';
-import CartTotal from '../components/CartTotal.jsx';
-import razorpay from '../assets/Razorpay.webp';
-import ShopDataContext from '../context/ShopDataContext.jsx';
-import AuthDataContext from '../context/AuthDataContext.jsx';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import React, { useState, useContext } from 'react'
+import Title from '../components/Title'
+import CartTotal from '../components/CartTotal.jsx'
+import razorpay from '../assets/Razorpay.webp'
+import ShopDataContext from '../context/ShopDataContext.jsx'
+import AuthDataContext from '../context/AuthDataContext.jsx'
+import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 
 function PlaceOrder() {
-  let [method, setMethod] = useState('cod');
-  const { cartItem, setCartItem, getCartAmount, delivery_fee, products } = useContext(ShopDataContext);
-  let { serverUrl } = useContext(AuthDataContext);
-  let navigate = useNavigate();
 
-  let [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    street: '',
-    city: '',
-    state: '',
-    pincode: '',
-    country: '',
-    phone: ''
-  });
+  const [method, setMethod] = useState('cod')
+  const { cartItem, setCartItem, getCartAmount, delivery_fee, products } = useContext(ShopDataContext)
+  const { serverUrl } = useContext(AuthDataContext)
+  const navigate = useNavigate()
+
+  const [formData, setFormData] = useState({
+    firstName: '', lastName: '', email: '',
+    street: '', city: '', state: '', pincode: '',
+    country: '', phone: ''
+  })
 
   const onChangeHandler = (e) => {
-    const name = e.target.name;
-    const value = e.target.value;
-    setFormData(data => ({ ...data, [name]: value }));
-  };
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+  }
 
   const initPay = (order) => {
     const options = {
@@ -41,11 +35,11 @@ function PlaceOrder() {
       description: 'Order Payment',
       order_id: order.id,
       handler: async function (response) {
-        const { data } = await axios.post(serverUrl + '/api/order/verifyrazorpay', response, { withCredentials: true });
+        const { data } = await axios.post(serverUrl + '/api/order/verifyrazorpay', response, { withCredentials: true })
         if (data) {
-          toast.success("🎉 Payment successful and order placed!");
-          navigate("/order");
-          setCartItem({});
+          toast.success("🎉 Payment successful and order placed!")
+          setCartItem({})
+          navigate("/order")
         }
       },
       prefill: {
@@ -53,26 +47,22 @@ function PlaceOrder() {
         email: formData.email,
         contact: formData.phone,
       },
-      theme: {
-        color: '#3399cc',
-      },
-    };
-    const rzp = new window.Razorpay(options);
-    rzp.open();
-  };
+      theme: { color: '#3399cc' }
+    }
+    const rzp = new window.Razorpay(options)
+    rzp.open()
+  }
 
   const onSubmitHandler = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
     try {
-      let orderItems = [];
-      for (const items in cartItem) {
-        for (const item in cartItem[items]) {
-          if (cartItem[items][item] > 0) {
-            const itemInfo = structuredClone(products.find(product => product._id === items));
-            if (itemInfo) {
-              itemInfo.size = item;
-              itemInfo.quantity = cartItem[items][item];
-              orderItems.push(itemInfo);
+      let orderItems = []
+      for (const itemId in cartItem) {
+        for (const size in cartItem[itemId]) {
+          if (cartItem[itemId][size] > 0) {
+            const item = products.find(p => p._id === itemId)
+            if (item) {
+              orderItems.push({ ...item, size, quantity: cartItem[itemId][size] })
             }
           }
         }
@@ -82,93 +72,88 @@ function PlaceOrder() {
         address: formData,
         items: orderItems,
         amount: getCartAmount() + delivery_fee
-      };
+      }
 
       if (method === 'cod') {
-        const result = await axios.post(serverUrl + "/api/order/placeorder", orderData, { withCredentials: true });
+        const result = await axios.post(serverUrl + "/api/order/placeorder", orderData, { withCredentials: true })
         if (result.data) {
-          toast.success("🎉 Order placed successfully with Cash on Delivery!");
-          setCartItem({});
-          navigate("/order");
+          toast.success("🎉 Order placed successfully with Cash on Delivery!")
+          setCartItem({})
+          navigate("/order")
         } else {
-          toast.error(result.data.message || "Something went wrong while placing the order.");
+          toast.error(result.data.message || "Something went wrong while placing the order.")
         }
       } else if (method === 'razorpay') {
-        const resultRazorpay = await axios.post(serverUrl + "/api/order/razorpay", orderData, { withCredentials: true });
-        if (resultRazorpay.data) {
-          initPay(resultRazorpay.data);
+        const result = await axios.post(serverUrl + "/api/order/razorpay", orderData, { withCredentials: true })
+        if (result.data) {
+          initPay(result.data)
         }
       }
+
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
-  };
+  }
 
   return (
-    <div className='w-full min-h-screen bg-gradient-to-l from-[#141414] to-[#0c2025] flex flex-col md:flex-row gap-10 px-5 pt-24 pb-10 overflow-y-auto'>
+    <div className='w-full min-h-[calc(100vh-120px)] pt-[70px] pb-[60px] bg-gradient-to-l from-[#141414] to-[#0c2025] flex flex-col md:flex-row gap-6 px-4 md:px-8 overflow-y-auto'>
 
-      {/* Left Side - Delivery Form */}
-      <div className='md:w-[55%] w-full'>
-        <form className='w-full' onSubmit={onSubmitHandler}>
+      {/* Left - Form + Payment Method */}
+      <div className='md:w-1/2 w-full'>
+        <form onSubmit={onSubmitHandler} className='w-full'>
           <Title text1="DELIVERY" text2="INFORMATION" />
+          <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6'>
 
-          {/* Input Fields */}
-          <div className='flex flex-wrap gap-4 mt-6'>
-            <input type="text" name="firstName" value={formData.firstName} onChange={onChangeHandler} required placeholder='First Name'
-              className='flex-1 min-w-[48%] h-[50px] bg-slate-700 text-white px-4 rounded-md' />
-            <input type="text" name="lastName" value={formData.lastName} onChange={onChangeHandler} required placeholder='Last Name'
-              className='flex-1 min-w-[48%] h-[50px] bg-slate-700 text-white px-4 rounded-md' />
-            <input type="email" name="email" value={formData.email} onChange={onChangeHandler} required placeholder='Email'
-              className='w-full h-[50px] bg-slate-700 text-white px-4 rounded-md' />
-            <input type="text" name="street" value={formData.street} onChange={onChangeHandler} required placeholder='Street'
-              className='w-full h-[50px] bg-slate-700 text-white px-4 rounded-md' />
-            <input type="text" name="city" value={formData.city} onChange={onChangeHandler} required placeholder='City'
-              className='flex-1 min-w-[48%] h-[50px] bg-slate-700 text-white px-4 rounded-md' />
-            <input type="text" name="state" value={formData.state} onChange={onChangeHandler} required placeholder='State'
-              className='flex-1 min-w-[48%] h-[50px] bg-slate-700 text-white px-4 rounded-md' />
-            <input type="text" name="pincode" value={formData.pincode} onChange={onChangeHandler} required placeholder='Pincode'
-              className='flex-1 min-w-[48%] h-[50px] bg-slate-700 text-white px-4 rounded-md' />
-            <input type="text" name="country" value={formData.country} onChange={onChangeHandler} required placeholder='Country'
-              className='flex-1 min-w-[48%] h-[50px] bg-slate-700 text-white px-4 rounded-md' />
-            <input type="text" name="phone" value={formData.phone} onChange={onChangeHandler} required placeholder='Phone'
-              className='w-full h-[50px] bg-slate-700 text-white px-4 rounded-md' />
+            <input type="text" placeholder="First name" name="firstName" required value={formData.firstName}
+              onChange={onChangeHandler} className="input-style" />
+            <input type="text" placeholder="Last name" name="lastName" required value={formData.lastName}
+              onChange={onChangeHandler} className="input-style" />
+            <input type="email" placeholder="Email" name="email" required value={formData.email}
+              onChange={onChangeHandler} className="input-style col-span-1 sm:col-span-2" />
+            <input type="text" placeholder="Street" name="street" required value={formData.street}
+              onChange={onChangeHandler} className="input-style col-span-1 sm:col-span-2" />
+            <input type="text" placeholder="City" name="city" required value={formData.city}
+              onChange={onChangeHandler} className="input-style" />
+            <input type="text" placeholder="State" name="state" required value={formData.state}
+              onChange={onChangeHandler} className="input-style" />
+            <input type="text" placeholder="Pincode" name="pincode" required value={formData.pincode}
+              onChange={onChangeHandler} className="input-style" />
+            <input type="text" placeholder="Country" name="country" required value={formData.country}
+              onChange={onChangeHandler} className="input-style" />
+            <input type="text" placeholder="Phone" name="phone" required value={formData.phone}
+              onChange={onChangeHandler} className="input-style col-span-1 sm:col-span-2" />
           </div>
 
-          <button type='submit' className='mt-6 w-full py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700'>
+          {/* Payment Method Section */}
+          <div className='mt-10'>
+            <Title text1="PAYMENT" text2="METHOD" />
+            <div className='flex flex-col sm:flex-row gap-6 mt-4 items-center'>
+              <button type="button" onClick={() => setMethod('razorpay')}
+                className={`w-full sm:w-[160px] h-[50px] rounded-sm overflow-hidden border
+                ${method === 'razorpay' ? 'border-blue-700 border-[3px]' : 'border-transparent'}`}>
+                <img src={razorpay} alt="razorpay" className='w-full h-full object-cover' />
+              </button>
+
+              <button type="button" onClick={() => setMethod('cod')}
+                className={`w-full sm:w-[200px] min-h-[50px] bg-gradient-to-t from-[#95b3f8] to-white text-[#332f6f] font-bold rounded-md px-4 py-2 
+                ${method === 'cod' ? 'border-blue-700 border-[3px]' : 'border border-transparent'}`}>
+                CASH ON DELIVERY
+              </button>
+            </div>
+          </div>
+
+          <button type='submit' className='mt-8 w-full py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700'>
             PLACE ORDER
           </button>
         </form>
       </div>
 
-      {/* Right Side - Cart Total and Payment */}
-      <div className='md:w-[45%] w-full flex flex-col items-center gap-6'>
+      {/* Right - Cart Total */}
+      <div className='md:w-1/2 w-full'>
         <CartTotal />
-
-        <div className='w-full'>
-          <Title text1="PAYMENT" text2="METHOD" />
-          <div className='flex flex-col sm:flex-row items-center justify-between gap-5 mt-4'>
-
-            {/* Razorpay */}
-            <button
-              onClick={() => setMethod('razorpay')}
-              className={`w-full sm:w-[160px] h-[50px] rounded-sm overflow-hidden border ${method === 'razorpay' ? 'border-blue-800 border-[3px]' : 'border-transparent'}`}>
-              <img src={razorpay} alt="razorpay" className='w-full h-full object-cover rounded-sm' />
-            </button>
-
-            {/* COD */}
-            <button
-              onClick={() => setMethod('cod')}
-              className={`w-full sm:w-[200px] min-h-[50px] bg-gradient-to-t from-[#95b3f8] to-white text-[#332f6f] font-bold rounded-sm px-4 py-2 text-center
-              ${method === 'cod' ? 'border-blue-800 border-[3px]' : 'border border-transparent'}`}>
-              CASH ON DELIVERY
-            </button>
-
-          </div>
-        </div>
       </div>
-
     </div>
-  );
+  )
 }
 
-export default PlaceOrder;
+export default PlaceOrder
