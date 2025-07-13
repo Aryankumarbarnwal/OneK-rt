@@ -19,7 +19,7 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    origin: ['http://localhost:5173','http://localhost:5174'],
+    origin: ['https://onek-rt-frontend.onrender.com','http://localhost:5174'],
     credentials: true,
   })
 );
