@@ -97,7 +97,7 @@ function ProductsDetail() {
               {productData.sizes.map((item, index) => (
                 <button
                   key={index}
-                  className={`border py-2 px-4 rounded-md bg-slate-300 
+                  className={`border py-2 px-4 rounded-md bg-slate-300 cursor-pointer
                     ${item === size ? 'bg-black text-[#2f97f1] text-[18px]' : ''}`}
                   onClick={() => setSize(item)}
                 >
@@ -106,7 +106,7 @@ function ProductsDetail() {
               ))}
             </div>
             <button
-              className='bg-[#495b61c9] mt-4 px-5 py-2 rounded-2xl border border-[#80808049] text-white shadow-md'
+              className='bg-[#495b61c9] mt-4 px-5 py-2 rounded-2xl border border-[#80808049] text-white shadow-md cursor-pointer'
               onClick={handleAddToCart}
             >
               Add To Cart
