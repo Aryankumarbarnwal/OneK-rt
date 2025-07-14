@@ -6,112 +6,103 @@ import { toast } from 'react-toastify'
 import open from '../assets/open.mp3'
 
 function Ai() {
-    const { showSearch, setShowSearch } = useContext(ShopDataContext)
-    const navigate = useNavigate()
-    let openingSound = new Audio(open)
+  const { showSearch, setShowSearch } = useContext(ShopDataContext)
+  const navigate = useNavigate()
+  const openingSound = new Audio(open)
 
-    function speak(message) {
-        const utterance = new SpeechSynthesisUtterance(message)
-        window.speechSynthesis.speak(utterance)
-    }
+  const speak = (message) => {
+    const utterance = new SpeechSynthesisUtterance(message)
+    window.speechSynthesis.speak(utterance)
+  }
 
-    const speechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+  const speechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
 
-    if (!speechRecognition) {
-        toast.error("Your browser doesn't support speech recognition.")
-        return null
-    }
+  if (!speechRecognition) {
+    toast.error("Your browser doesn't support speech recognition.")
+    return null
+  }
 
+  const handleVoiceCommand = () => {
     const recognition = new speechRecognition()
     recognition.continuous = false
     recognition.interimResults = false
     recognition.lang = 'en-US'
 
-    let isRecognized = false // To track if speech was understood
+    let isRecognized = false
 
     recognition.onresult = (e) => {
-    isRecognized = true
-    const transcript = e.results[0][0].transcript.trim().toLowerCase()
-    console.log("🎤 Transcript:", transcript)
+      isRecognized = true
+      const transcript = e.results[0][0].transcript.trim().toLowerCase()
+      console.log("🎤 Transcript:", transcript)
 
-    if (transcript.includes("search") && transcript.includes("open") && !showSearch) {
+      const commandMatched = (phrase) => transcript.includes(phrase)
+
+      if (commandMatched("search") && commandMatched("open") && !showSearch) {
         speak("Opening search")
-        openingSound.play()
         setShowSearch(true)
         navigate("/collections")
-    }
-    else if (transcript.includes("search") && transcript.includes("close") && showSearch) {
+      } else if (commandMatched("search") && commandMatched("close") && showSearch) {
         speak("Closing search")
-        openingSound.play()
         setShowSearch(false)
-    }
-    else if (transcript.includes("collection") || transcript.includes("collections") || transcript.includes("products")) {
+      } else if (["collection", "collections", "products"].some(commandMatched)) {
         speak("Opening collection page")
-        openingSound.play()
         setShowSearch(false)
         navigate("/collections")
-    }
-    else if (transcript.includes("about")) {
+      } else if (commandMatched("about")) {
         speak("Opening about page")
-        openingSound.play()
         setShowSearch(false)
         navigate("/about")
-    }
-    else if (transcript.includes("home")) {
+      } else if (commandMatched("home")) {
         speak("Opening home page")
-        openingSound.play()
         setShowSearch(false)
         navigate("/")
-    }
-    else if (transcript.includes("cart") || transcript.includes("kaat") || transcript.includes("caat")) {
+      } else if (["cart", "kaat", "caat"].some(commandMatched)) {
         speak("Opening your cart")
-        openingSound.play()
         setShowSearch(false)
         navigate("/cart")
-    }
-    else if (transcript.includes("contact")) {
+      } else if (commandMatched("contact")) {
         speak("Opening contact page")
-        openingSound.play()
         setShowSearch(false)
         navigate("/contact")
-    }
-    else if (transcript.includes("order")) {
+      } else if (commandMatched("order")) {
         speak("Opening your orders page")
-        openingSound.play()
         setShowSearch(false)
         navigate("/order")
-    }
-    else {
+      } else {
         toast.error("Command not recognized. Please try again.")
+      }
     }
-}
-
 
     recognition.onend = () => {
-        if (!isRecognized) {
-            toast.warning("Didn't catch that. Please try again.")
-        }
+      if (!isRecognized) {
+        toast.warning("Didn't catch that. Please try again.")
+      }
     }
 
-    return (
-        <div
-            className='fixed lg:bottom-[20px] md:bottom-[40px] bottom-[80px] left-[2%] z-50'
-            onClick={() => {
-                isRecognized = false // Reset before starting recognition
-                recognition.start()
-                openingSound.play()
-            }}
-        >
-            <img
-                src={ai}
-                alt="AI Assistant"
-                className="w-[80px] md:w-[90px] lg:w-[100px] cursor-pointer 
-                           rounded-full border-[3px] border-[#00bcd4] 
-                           shadow-lg hover:shadow-cyan-500/50 transition-all duration-300 
-                           hover:scale-110 animate-bounce"
-            />
-        </div>
-    )
+    openingSound.play().then(() => {
+      // Wait for sound to finish before starting recognition
+      recognition.start()
+    }).catch(() => {
+      // If sound fails, still start recognition
+      recognition.start()
+    })
+  }
+
+  return (
+    <div
+      className='fixed lg:bottom-[20px] md:bottom-[40px] bottom-[80px] left-[2%] z-50'
+      onClick={handleVoiceCommand}
+    >
+      <img
+        src={ai}
+        alt="AI Assistant"
+        className="w-[80px] md:w-[90px] lg:w-[100px] cursor-pointer 
+                   rounded-full border-[3px] border-[#00bcd4] 
+                   shadow-lg hover:shadow-cyan-500/50 transition-all duration-300 
+                   hover:scale-110 animate-bounce"
+      />
+    </div>
+  )
 }
 
 export default Ai
