@@ -8,14 +8,12 @@ import open from '../assets/open.mp3'
 function Ai() {
   const { showSearch, setShowSearch } = useContext(ShopDataContext)
   const navigate = useNavigate()
-  const openingSound = new Audio(open)
+  const speechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
 
-  const speak = (message) => {
-    const utterance = new SpeechSynthesisUtterance(message)
+  const speak = (msg) => {
+    const utterance = new SpeechSynthesisUtterance(msg)
     window.speechSynthesis.speak(utterance)
   }
-
-  const speechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
 
   if (!speechRecognition) {
     toast.error("Your browser doesn't support speech recognition.")
@@ -23,82 +21,78 @@ function Ai() {
   }
 
   const handleVoiceCommand = () => {
-  const recognition = new speechRecognition()
-  recognition.continuous = false
-  recognition.interimResults = false
-  recognition.lang = 'en-US'
+    const recognition = new speechRecognition()
+    recognition.continuous = false
+    recognition.interimResults = false
+    recognition.lang = 'en-US'
 
-  let isRecognized = false
+    let isRecognized = false
+    const openingSound = new Audio(open)
 
-  recognition.onstart = () => {
-    console.log("🎙 Voice recognition started");
-    toast.info("Listening...");
-  }
-
-  recognition.onresult = (e) => {
-    isRecognized = true
-    const transcript = e.results[0][0].transcript.trim().toLowerCase()
-    console.log("🎤 Transcript:", transcript)
-
-    const commandMatched = (phrase) => transcript.includes(phrase)
-
-    if (commandMatched("search") && commandMatched("open") && !showSearch) {
-      speak("Opening search")
-      setShowSearch(true)
-      navigate("/collections")
-    } else if (commandMatched("search") && commandMatched("close") && showSearch) {
-      speak("Closing search")
-      setShowSearch(false)
-    } else if (["collection", "collections", "products"].some(commandMatched)) {
-      speak("Opening collection page")
-      setShowSearch(false)
-      navigate("/collections")
-    } else if (commandMatched("about")) {
-      speak("Opening about page")
-      setShowSearch(false)
-      navigate("/about")
-    } else if (commandMatched("home")) {
-      speak("Opening home page")
-      setShowSearch(false)
-      navigate("/")
-    } else if (["cart", "kaat", "caat"].some(commandMatched)) {
-      speak("Opening your cart")
-      setShowSearch(false)
-      navigate("/cart")
-    } else if (commandMatched("contact")) {
-      speak("Opening contact page")
-      setShowSearch(false)
-      navigate("/contact")
-    } else if (commandMatched("order")) {
-      speak("Opening your orders page")
-      setShowSearch(false)
-      navigate("/order")
-    } else {
-      toast.error("Command not recognized. Please try again.")
+    recognition.onstart = () => {
+      console.log("🎙 Voice recognition started")
+      toast.info("Listening...")
     }
-  }
 
-  recognition.onerror = (e) => {
-    console.error("SpeechRecognition error:", e.error)
-    toast.error(`Error: ${e.error}`)
-  }
+    recognition.onresult = (e) => {
+      isRecognized = true
+      const transcript = e.results[0][0].transcript.trim().toLowerCase()
+      console.log("🎤 Transcript:", transcript)
 
-  recognition.onend = () => {
-    if (!isRecognized) {
-      toast.warning("Didn't catch that. Please try again.")
-    } else {
-      console.log("🎙 Voice recognition ended")
+      const match = (word) => transcript.includes(word)
+
+      if (match("search") && match("open")) {
+        speak("Opening search")
+        setShowSearch(true)
+        navigate("/collections")
+      } else if (match("search") && match("close")) {
+        speak("Closing search")
+        setShowSearch(false)
+      } else if (["collection", "collections", "products"].some(match)) {
+        speak("Opening collection page")
+        setShowSearch(false)
+        navigate("/collections")
+      } else if (match("about")) {
+        speak("Opening about page")
+        setShowSearch(false)
+        navigate("/about")
+      } else if (match("home")) {
+        speak("Opening home page")
+        setShowSearch(false)
+        navigate("/")
+      } else if (["cart", "kaat", "caat"].some(match)) {
+        speak("Opening your cart")
+        setShowSearch(false)
+        navigate("/cart")
+      } else if (match("contact")) {
+        speak("Opening contact page")
+        setShowSearch(false)
+        navigate("/contact")
+      } else if (match("order")) {
+        speak("Opening your orders page")
+        setShowSearch(false)
+        navigate("/order")
+      } else {
+        toast.error("Command not recognized")
+      }
     }
+
+    recognition.onerror = (e) => {
+      console.error("🎙 Speech error:", e.error)
+      toast.error(`Error: ${e.error}`)
+    }
+
+    recognition.onend = () => {
+      if (!isRecognized) {
+        toast.warning("Didn't catch that. Try again.")
+      }
+    }
+
+    // Play sound, then start listening
+    openingSound.play().finally(() => {
+      recognition.start()
+    })
   }
-
-  // Play sound THEN start recognition
-  openingSound.play().then(() => {
-    recognition.start()
-  }).catch(() => {
-    recognition.start()
-  })
-}
-
 
   return (
     <div
@@ -109,9 +103,9 @@ function Ai() {
         src={ai}
         alt="AI Assistant"
         className="w-[80px] md:w-[90px] lg:w-[100px] cursor-pointer 
-                   rounded-full border-[3px] border-[#00bcd4] 
-                   shadow-lg hover:shadow-cyan-500/50 transition-all duration-300 
-                   hover:scale-110 animate-bounce"
+          rounded-full border-[3px] border-[#00bcd4] 
+          shadow-lg hover:shadow-cyan-500/50 transition-all duration-300 
+          hover:scale-110 animate-bounce"
       />
     </div>
   )
