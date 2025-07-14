@@ -28,7 +28,9 @@ function Login()  {
         console.log(result.data);
 
       toast.success("Login Successfully");
-      getCurrentUser();
+      
+      await getCurrentUser();
+      
       navigate('/')
 
     }
@@ -48,7 +50,7 @@ function Login()  {
         console.log(result.data);
 
         toast.success("Login Successfully")
-        getCurrentUser();
+        await getCurrentUser();
         navigate("/");
     }
     catch (error) {
