@@ -52,8 +52,8 @@ function Registration() {
         { name, email, password },
         { withCredentials: true });
 
-      let user = await getCurrentUser();
-      if(user) {
+      let usern = await getCurrentUser();
+      if(usern) {
         navigate('/')
       }
       else{
