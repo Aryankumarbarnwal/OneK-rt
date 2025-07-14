@@ -2,6 +2,7 @@ import { genToken, genToken1 } from "../config/token.js";
 import User from "../model/userModel.js";
 import bcrypt from "bcrypt";
 import validator from "validator";
+import { toast } from 'react-toastify';
 
 
 export const registration = async (req, res) => {
