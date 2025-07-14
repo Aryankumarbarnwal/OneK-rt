@@ -70,8 +70,10 @@ function Registration() {
       }
     }
     catch (error) {
-      console.log(error);
-    }
+  console.log("Registration Error:", error.response?.data?.message || error.message);
+  toast.error(error.response?.data?.message || "Registration failed");
+}
+
   }
 
 
