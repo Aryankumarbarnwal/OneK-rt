@@ -17,6 +17,8 @@ import Order from './pages/Order.jsx'
 import NotFound from './pages/NotFound.jsx'
 import { ToastContainer} from 'react-toastify';
 import Ai from './components/Ai.jsx'
+import axios from 'axios'  // 👈 Step 1: Axios import
+axios.defaults.withCredentials = true  // ✅ Step 2: Enable credentials globally
 
 function App() {
   let {userData} = useContext(UserDataContext);
