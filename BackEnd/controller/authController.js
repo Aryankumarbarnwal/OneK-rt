@@ -10,6 +10,7 @@ export const registration = async (req, res) => {
         const existUser = await User.findOne({ email });
         if (existUser) {
             console.log("Registration failed: user already exists");
+            toast.error("Password must be at least 8 characters long");
             return res.status(400).json({ message: "User already exist" });
         }
         if (!validator.isEmail(email)) {
