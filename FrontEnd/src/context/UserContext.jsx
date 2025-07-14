@@ -3,6 +3,7 @@ import AuthDataContext from './AuthDataContext';
 import { useState } from 'react';
 import axios from 'axios';
 import UserDataContext  from './UserDataContext';
+import { toast } from 'react-toastify'
 
 function UserContext({ children }) {
     let [userData, setUserData] = useState("")
@@ -15,10 +16,12 @@ function UserContext({ children }) {
                 {withCredentials:true})
 
             setUserData(result.data)
+            return result.data;
             console.log(result.data)
 
         } catch (error) {
             setUserData(null)
+            toast.error("User data load Failed");
             console.log(error)
         }
     }
