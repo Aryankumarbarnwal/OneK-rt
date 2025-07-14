@@ -27,7 +27,7 @@ function Ai() {
     const recognition = new speechRecognition()
     recognition.continuous = false
     recognition.interimResults = false
-    recognition.lang = 'en-US'
+
 
     let isRecognized = false
 
