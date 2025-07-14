@@ -7,6 +7,7 @@ import axios from 'axios'
 import { signInWithPopup } from 'firebase/auth';
 import { auth, provider } from '../../util/FireBase';
 import UserDataContext from '../context/UserDataContext.jsx';
+import { toast } from 'react-toastify'
 
 function Registration() {
 
@@ -31,8 +32,13 @@ function Registration() {
       const result = await axios.post(serverUrl + '/api/auth/googlelogin',
         { name, email }, { withCredentials: true })
       console.log(result.data);
-      getCurrentUser();
-      navigate("/");
+      let user = await getCurrentUser();
+      if(user){
+        navigate("/");
+      }
+      else{
+        toast.error("User data not loaded");
+      }
     }
     catch (error) {
       console.log(error);
@@ -46,8 +52,13 @@ function Registration() {
         { name, email, password },
         { withCredentials: true });
 
-      getCurrentUser();
-      navigate('/')
+      let user = await getCurrentUser();
+      if(user) {
+        navigate('/')
+      }
+      else{
+        toast.error("User data not loaded");
+      }
       console.log(result.data);
 
       console.log("Server response:", result);
