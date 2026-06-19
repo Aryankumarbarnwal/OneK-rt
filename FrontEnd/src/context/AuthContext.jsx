@@ -2,7 +2,7 @@ import AuthDataContext from './AuthDataContext'
 
 
 function AuthContext ({children}) {
-  let serverUrl = "https://one-k-rt-hs6u.vercel.app"
+  let serverUrl = "https://onek-rt-backend.onrender.com"
     let value = {
       serverUrl
     };
