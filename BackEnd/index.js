@@ -19,7 +19,7 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    origin: ['https://one-k-rt-newshoppingapp.vercel.app','https://one-k-rt-hs6u.vercel.app'],
+    origin: ['https://one-k-rt-newshoppingapp.vercel.app','https://onek-rt-admin.onrender.com'],
     credentials: true,
   })
 );
