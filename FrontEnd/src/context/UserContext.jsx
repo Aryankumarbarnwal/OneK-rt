@@ -26,10 +26,7 @@ function UserContext({ children }) {
         }
     }
     useEffect(() => {
-      if (document.cookie.includes("token")) {
-          console.log("Document.cookie:", document.cookie);
-            getCurrentUser();  // 👈 tabhi call karo agar token hai
-      }
+      getCurrentUser(); 
     }, []);
 
     let value = {
