@@ -127,9 +127,11 @@ function ShopContext({children}) {
         getProducts()
     },[])
 
-    useEffect(()=>{
-        getUserCart()
-    },[])
+    useEffect(() => {
+    if (userData) {
+        getUserCart();
+    }
+}, [userData]);
 
     let value = {
         products, currency, delivery_fee, getProducts, search, 
