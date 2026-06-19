@@ -19,7 +19,7 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    origin: ['https://onek-rt-frontend.onrender.com','https://onek-rt-admin.onrender.com'],
+    origin: ['https://one-k-rt-i7pz-eko28crwv-aryankumarbarnwals-projects.vercel.app','https://onek-rt-admin.onrender.com'],
     credentials: true,
   })
 );
