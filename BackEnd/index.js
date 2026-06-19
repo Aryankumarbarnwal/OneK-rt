@@ -19,7 +19,7 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    origin: ['https://one-k-rt-i7pz-eko28crwv-aryankumarbarnwals-projects.vercel.app','https://one-k-rt-znad.vercel.app'],
+    origin: ['https://one-k-rt-newshoppingapp.vercel.app','https://one-k-rt-znad.vercel.app'],
     credentials: true,
   })
 );
